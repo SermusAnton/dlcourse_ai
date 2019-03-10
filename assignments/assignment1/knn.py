@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.spatial.distance import cdist, squareform
 
 
 class KNN:
@@ -54,8 +55,8 @@ class KNN:
         dists = np.zeros((num_test, num_train), np.float32)
         for i_test in range(num_test):
             for i_train in range(num_train):
-                # TODO: Fill dists[i_test][i_train]
-                pass
+                dists[i_test][i_train]=np.sum(np.abs(self.train_X[i_train] - X[i_test]))
+        return dists
 
     def compute_distances_one_loop(self, X):
         '''
@@ -73,9 +74,8 @@ class KNN:
         num_test = X.shape[0]
         dists = np.zeros((num_test, num_train), np.float32)
         for i_test in range(num_test):
-            # TODO: Fill the whole row of dists[i_test]
-            # without additional loops
-            pass
+            dists[i_test]=np.abs(self.train_X - X[i_test]).sum(axis=1)
+        return dists
 
     def compute_distances_no_loops(self, X):
         '''
@@ -93,8 +93,8 @@ class KNN:
         num_test = X.shape[0]
         # Using float32 to to save memory - the default is float64
         dists = np.zeros((num_test, num_train), np.float32)
-        # TODO: Implement computing all distances with no loops!
-        pass
+        dists = (np.abs(X[:,np.newaxis,:] - self.train_X[np.newaxis, :])).sum(axis=2)
+        return dists
 
     def predict_labels_binary(self, dists):
         '''
@@ -110,10 +110,8 @@ class KNN:
         '''
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.bool)
-        for i in range(num_test):
-            # TODO: Implement choosing best class based on k
-            # nearest training samples
-            pass
+#         for i in range(num_test):
+        pred = dists<self.k
         return pred
 
     def predict_labels_multiclass(self, dists):

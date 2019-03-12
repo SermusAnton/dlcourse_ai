@@ -26,13 +26,15 @@ class KNN:
         predictions, np array of ints (num_samples) - predicted class
            for each sample
         '''
+#         В зависимости от выбранного способа рассчитываем массив расстояние
         if num_loops == 0:
             dists = self.compute_distances_no_loops(X)
         elif num_loops == 1:
             dists = self.compute_distances_one_loop(X)
         else:
             dists = self.compute_distances_two_loops(X)
-
+        # Если массив образов соответствия 0 представлен булевыми значеними
+#         то получаем булевый массив отклонения от 0
         if self.train_y.dtype == np.bool:
             return self.predict_labels_binary(dists)
         else:
@@ -110,8 +112,18 @@ class KNN:
         '''
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.bool)
-#         for i in range(num_test):
-        pred = dists<self.k
+        for i in range(num_test):
+#             print(i)
+            idx = np.argpartition(dists[i], self.k)
+            #             Получаем минимальные первые К индексов 
+            min_k = idx[:self.k]
+#             display(min_k)
+            # Получаем булевый ответ 0 или нет соотв. индекс
+            all_value = self.train_y[min_k]
+#             display(all_value)
+            count_y_0 = (all_value==True).sum()
+#             display(count_y_0) 
+            pred[i] = count_y_0 >= self.k - count_y_0
         return pred
 
     def predict_labels_multiclass(self, dists):

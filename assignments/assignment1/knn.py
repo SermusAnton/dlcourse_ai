@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.spatial.distance import cdist, squareform
-
+from collections import Counter
 
 class KNN:
     """
@@ -114,8 +114,9 @@ class KNN:
         pred = np.zeros(num_test, np.bool)
         for i in range(num_test):
 #             print(i)
+#             получаем индексы минимальных self.k значений
             idx = np.argpartition(dists[i], self.k)
-            #             Получаем минимальные первые К индексов 
+            #  Получаем минимальные первые К индексов 
             min_k = idx[:self.k]
 #             display(min_k)
             # Получаем булевый ответ 0 или нет соотв. индекс
@@ -142,7 +143,12 @@ class KNN:
         num_test = dists.shape[0]
         pred = np.zeros(num_test, np.int)
         for i in range(num_test):
-            # TODO: Implement choosing best class based on k
+            # Implement choosing best class based on k
             # nearest training samples
-            pass
+            idx = np.argpartition(dists[i], self.k)
+            min_k = idx[:self.k]
+            all_value = self.train_y[min_k]
+            value_cat = Counter(all_value)
+#             print(value_cat.most_common(1)[0][0])
+            pred[i]=value_cat.most_common(1)[0][0]
         return pred
